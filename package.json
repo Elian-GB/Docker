@@ -1,0 +1,13 @@
+{
+  "name": "docker-visitor-counter",
+  "version": "1.0.0",
+  "description": "Un contador de visitas con Node.js, Redis y Docker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "redis": "^4.6.13"
+  }
+}

@@ -1,0 +1,14 @@
+services:
+  # Servicio 1: Nuestra aplicación web Node.js
+  web-app:
+    build: .
+    ports:
+      - "3000:3000" # Mapea el puerto 3000 de tu PC al 3000 del contenedor
+    depends_on:
+      - redis-server # Le dice a Docker que inicie Redis primero
+
+  # Servicio 2: Base de datos Redis
+  redis-server:
+    image: "redis:alpine" # Descarga la imagen oficial de Redis
+    ports:
+      - "6379:6379"

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Visitas | Docker</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob shape-1"></div>
+        <div class="blob shape-2"></div>
+        <div class="blob shape-3"></div>
+    </div>
+
+    <main class="glass-container">
+        <div class="badge">PROYECTO DOCKER</div>
+        <h1>¡Hola Mundo Contenerizado!</h1>
+        <p class="subtitle">Esta página web está corriendo en un contenedor de Node.js, y conectada a una base de datos Redis en otro contenedor.</p>
+        
+        <div class="counter-box">
+            <h2 class="counter-label">Visitas Totales</h2>
+            <div class="counter-value" id="visit-count">
+                <div class="loader"></div>
+            </div>
+        </div>
+
+        <div class="tech-stack">
+            <span class="tech-pill node">Node.js</span>
+            <span class="tech-pill redis">Redis</span>
+            <span class="tech-pill docker">Docker Compose</span>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
