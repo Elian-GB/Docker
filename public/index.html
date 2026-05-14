@@ -3,38 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador de Visitas | Docker</title>
-    <!-- Google Fonts -->
+    <title>Luxury Visit Tracker</title>
+    <!-- Fonts para diseño Luxury: Playfair Display para encabezados, Inter para cuerpo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="background-blobs">
-        <div class="blob shape-1"></div>
-        <div class="blob shape-2"></div>
-        <div class="blob shape-3"></div>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <h1 class="logo">Luxe<span>Track</span></h1>
+            <button id="logout-btn" class="btn btn-outline hidden">Cerrar Sesión</button>
+        </header>
+
+        <main class="main-content">
+            <!-- SECCIÓN DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
+            <section id="auth-section" class="card auth-card">
+                <div class="auth-tabs">
+                    <button id="tab-login" class="tab active">Iniciar Sesión</button>
+                    <button id="tab-register" class="tab">Registrarse</button>
+                </div>
+
+                <form id="auth-form" class="form">
+                    <div class="input-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" name="username" required placeholder="Ingresa tu usuario">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
+                    </div>
+                    <div id="auth-error" class="error-msg hidden"></div>
+                    <button type="submit" class="btn btn-primary w-100" id="auth-submit-btn">Entrar</button>
+                </form>
+            </section>
+
+            <!-- SECCIÓN DEL USUARIO (DASHBOARD) -->
+            <section id="user-section" class="hidden">
+                <div class="card dashboard-card fade-in">
+                    <h2 class="greeting">Bienvenido de vuelta, <span id="user-name-display"></span>.</h2>
+                    <p class="subtitle">Tu historial personal de visitas</p>
+                    
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <span class="stat-label">Visitas Personales</span>
+                            <span class="stat-value" id="personal-visits-count">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN DEL ADMINISTRADOR -->
+            <section id="admin-section" class="hidden">
+                <div class="card admin-card fade-in">
+                    <h2>Panel de Administración</h2>
+                    <p class="subtitle">Resumen global diario</p>
+                    
+                    <div class="admin-stats-list" id="admin-stats-list">
+                        <div class="loading">Cargando estadísticas...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-
-    <main class="glass-container">
-        <div class="badge">PROYECTO DOCKER</div>
-        <h1>¡Hola Mundo Contenerizado!</h1>
-        <p class="subtitle">Esta página web está corriendo en un contenedor de Node.js, y conectada a una base de datos Redis en otro contenedor.</p>
-        
-        <div class="counter-box">
-            <h2 class="counter-label">Visitas Totales</h2>
-            <div class="counter-value" id="visit-count">
-                <div class="loader"></div>
-            </div>
-        </div>
-
-        <div class="tech-stack">
-            <span class="tech-pill node">Node.js</span>
-            <span class="tech-pill redis">Redis</span>
-            <span class="tech-pill docker">Docker Compose</span>
-        </div>
-    </main>
 
     <script src="script.js"></script>
 </body>
