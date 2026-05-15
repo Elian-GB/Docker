@@ -11,16 +11,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Elementos decorativos de fondo -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
     <div class="app-container">
         <!-- HEADER -->
-        <header class="header">
+        <header class="header glass-panel">
             <h1 class="logo">Luxe<span>Track</span></h1>
             <button id="logout-btn" class="btn btn-outline hidden">Cerrar Sesión</button>
         </header>
 
         <main class="main-content">
             <!-- SECCIÓN DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
-            <section id="auth-section" class="card auth-card">
+            <section id="auth-section" class="card auth-card glass-panel fade-in">
                 <div class="auth-tabs">
                     <button id="tab-login" class="tab active">Iniciar Sesión</button>
                     <button id="tab-register" class="tab">Registrarse</button>
@@ -35,19 +40,18 @@
                         <label for="password">Contraseña</label>
                         <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
                     </div>
-                    <div id="auth-error" class="error-msg hidden"></div>
                     <button type="submit" class="btn btn-primary w-100" id="auth-submit-btn">Entrar</button>
                 </form>
             </section>
 
             <!-- SECCIÓN DEL USUARIO (DASHBOARD) -->
             <section id="user-section" class="hidden">
-                <div class="card dashboard-card fade-in">
+                <div class="card dashboard-card glass-panel fade-in">
                     <h2 class="greeting">Bienvenido de vuelta, <span id="user-name-display"></span>.</h2>
                     <p class="subtitle">Tu historial personal de visitas</p>
                     
                     <div class="stats-container">
-                        <div class="stat-box">
+                        <div class="stat-box glass-panel-inner">
                             <span class="stat-label">Visitas Personales</span>
                             <span class="stat-value" id="personal-visits-count">0</span>
                         </div>
@@ -57,7 +61,7 @@
 
             <!-- SECCIÓN DEL ADMINISTRADOR -->
             <section id="admin-section" class="hidden">
-                <div class="card admin-card fade-in">
+                <div class="card admin-card glass-panel fade-in">
                     <h2>Panel de Administración</h2>
                     <p class="subtitle">Resumen global diario</p>
                     
@@ -68,6 +72,9 @@
             </section>
         </main>
     </div>
+
+    <!-- Contenedor para Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
 
     <script src="script.js"></script>
 </body>

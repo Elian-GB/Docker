@@ -3,12 +3,28 @@ services:
   web-app:
     build: .
     ports:
-      - "3000:3000" # Mapea el puerto 3000 de tu PC al 3000 del contenedor
+      - "3000:3000"
     depends_on:
-      - redis-server # Le dice a Docker que inicie Redis primero
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_NAME=mydb
+      - DB_PORT=5432
 
-  # Servicio 2: Base de datos Redis
-  redis-server:
-    image: "redis:alpine" # Descarga la imagen oficial de Redis
+  # Servicio 2: Base de datos PostgreSQL
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=mydb
     ports:
-      - "6379:6379"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:
