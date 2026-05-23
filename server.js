@@ -74,20 +74,20 @@ async function startServer() {
 
   // Registro
   app.post('/api/register', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Faltan datos' });
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) return res.status(400).json({ error: 'Faltan datos' });
     
     try {
-      const userCheck = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
-      if (userCheck.rows.length > 0) return res.status(400).json({ error: 'El usuario ya existe' });
+      const userCheck = await pool.query('SELECT id FROM users WHERE username = $1 OR email = $2', [username, email]);
+      if (userCheck.rows.length > 0) return res.status(400).json({ error: 'El usuario o correo electrónico ya existe' });
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const role = username.toLowerCase() === 'admin' ? 'admin' : 'user';
       const verificationToken = crypto.randomBytes(32).toString('hex');
       
       await pool.query(
-        'INSERT INTO users (username, password, role, is_verified, verification_token) VALUES ($1, $2, $3, false, $4)',
-        [username, hashedPassword, role, verificationToken]
+        'INSERT INTO users (username, email, password, role, is_verified, verification_token) VALUES ($1, $2, $3, $4, false, $5)',
+        [username, email, hashedPassword, role, verificationToken]
       );
       
       // Enviar correo de verificación
@@ -95,7 +95,7 @@ async function startServer() {
         const verifyUrl = `http://localhost:3000/api/verify/${verificationToken}`;
         let info = await transporter.sendMail({
           from: '"LuxeTrack Admin" <admin@luxetrack.com>',
-          to: `${username}@example.com`, // Email simulado basado en el username
+          to: email, // Usar el correo electrónico real ingresado
           subject: "Verifica tu cuenta en LuxeTrack",
           text: `Hola ${username}, por favor verifica tu cuenta haciendo clic en el siguiente enlace: ${verifyUrl}`,
           html: `<p>Hola ${username},</p><p>Por favor verifica tu cuenta haciendo clic en el siguiente enlace:</p><a href="${verifyUrl}">${verifyUrl}</a>`,

@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const authForm = document.getElementById('auth-form');
     const authSubmitBtn = document.getElementById('auth-submit-btn');
     const logoutBtn = document.getElementById('logout-btn');
+    const emailGroup = document.getElementById('email-group');
+    const emailInput = document.getElementById('email');
     
     const userNameDisplay = document.getElementById('user-name-display');
     const personalVisitsCount = document.getElementById('personal-visits-count');
@@ -51,10 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
             tabLogin.classList.add('active');
             tabRegister.classList.remove('active');
             authSubmitBtn.textContent = 'Entrar';
+            emailGroup.classList.add('hidden');
+            emailInput.removeAttribute('required');
         } else {
             tabRegister.classList.add('active');
             tabLogin.classList.remove('active');
             authSubmitBtn.textContent = 'Registrarse';
+            emailGroup.classList.remove('hidden');
+            emailInput.setAttribute('required', 'required');
         }
     }
 
@@ -64,13 +70,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const username = authForm.username.value;
         const password = authForm.password.value;
+        const email = currentMode === 'register' ? authForm.email.value : undefined;
         const endpoint = currentMode === 'login' ? '/api/login' : '/api/register';
 
         try {
+            const bodyData = { username, password };
+            if (currentMode === 'register') {
+                bodyData.email = email;
+            }
+
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify(bodyData)
             });
 
             const data = await response.json();

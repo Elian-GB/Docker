@@ -2,6 +2,7 @@ services:
   # Servicio 1: Nuestra aplicación web Node.js
   web-app:
     build: .
+    restart: on-failure
     ports:
       - "3000:3000"
     depends_on:
@@ -25,6 +26,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # Servicio 3: Visualización de Base de Datos (Adminer)
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
 
 volumes:
   postgres_data:
