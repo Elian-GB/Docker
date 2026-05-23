@@ -7,20 +7,16 @@ services:
       - "3000:3000"
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_USER=myuser
-      - DB_PASSWORD=mypassword
-      - DB_NAME=mydb
-      - DB_PORT=5432
+    env_file:
+      - .env
 
   # Servicio 2: Base de datos PostgreSQL
   db:
     image: postgres:15-alpine
     environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=mydb
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     ports:
       - "5432:5432"
     volumes:

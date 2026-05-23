@@ -57,7 +57,7 @@ async function startServer() {
       pool: pool,
       tableName: 'session'
     }),
-    secret: 'secreto_super_seguro_123',
+    secret: process.env.SESSION_SECRET || 'secreto_super_seguro_123',
     resave: false,
     saveUninitialized: false,
     cookie: { 
