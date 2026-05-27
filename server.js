@@ -139,7 +139,7 @@ async function startServer() {
 
   // Login
   app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, rememberMe } = req.body;
     
     try {
       const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -148,13 +148,26 @@ async function startServer() {
       const user = result.rows[0];
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) return res.status(400).json({ error: 'Contraseña incorrecta' });
-
+ 
       if (!user.is_verified) return res.status(403).json({ error: 'Tu cuenta no está verificada. Revisa el correo enviado (ver consola del servidor).' });
       
       req.session.userId = user.id;
       req.session.username = user.username;
       req.session.role = user.role;
-      res.json({ message: 'Login exitoso', username: user.username, role: user.role });
+
+      if (rememberMe) {
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 días
+      } else {
+        req.session.cookie.maxAge = null; // Expira al cerrar el navegador
+      }
+
+      req.session.save((err) => {
+        if (err) {
+          console.error('Error guardando sesión:', err);
+          return res.status(500).json({ error: 'Error al iniciar sesión' });
+        }
+        res.json({ message: 'Login exitoso', username: user.username, role: user.role });
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Error al iniciar sesión' });

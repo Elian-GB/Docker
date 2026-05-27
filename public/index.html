@@ -43,6 +43,16 @@
                     <div class="input-group">
                         <label for="password">Contraseña</label>
                         <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
+                        <div class="strength-meter hidden" id="strength-meter">
+                            <div class="strength-bar-container">
+                                <div class="strength-bar" id="strength-bar"></div>
+                            </div>
+                            <span class="strength-text" id="strength-text"></span>
+                        </div>
+                    </div>
+                    <div class="checkbox-group" id="remember-me-group">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">Mantener sesión iniciada</label>
                     </div>
                     <button type="submit" class="btn btn-primary w-100" id="auth-submit-btn">Entrar</button>
                 </form>

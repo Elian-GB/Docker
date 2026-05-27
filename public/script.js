@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
     const emailGroup = document.getElementById('email-group');
     const emailInput = document.getElementById('email');
+    const rememberMeGroup = document.getElementById('remember-me-group');
+    const rememberMeInput = document.getElementById('rememberMe');
+    const strengthMeter = document.getElementById('strength-meter');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
     
     const userNameDisplay = document.getElementById('user-name-display');
     const personalVisitsCount = document.getElementById('personal-visits-count');
@@ -49,18 +54,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function switchMode(mode) {
         currentMode = mode;
+        strengthMeter.classList.add('hidden');
+        
         if (mode === 'login') {
             tabLogin.classList.add('active');
             tabRegister.classList.remove('active');
             authSubmitBtn.textContent = 'Entrar';
             emailGroup.classList.add('hidden');
             emailInput.removeAttribute('required');
+            rememberMeGroup.classList.remove('hidden');
         } else {
             tabRegister.classList.add('active');
             tabLogin.classList.remove('active');
             authSubmitBtn.textContent = 'Registrarse';
             emailGroup.classList.remove('hidden');
             emailInput.setAttribute('required', 'required');
+            rememberMeGroup.classList.add('hidden');
+            if (authForm.password.value) {
+                strengthMeter.classList.remove('hidden');
+                updatePasswordStrength(authForm.password.value);
+            }
         }
     }
 
@@ -71,12 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = authForm.username.value;
         const password = authForm.password.value;
         const email = currentMode === 'register' ? authForm.email.value : undefined;
+        const rememberMe = currentMode === 'login' ? rememberMeInput.checked : false;
         const endpoint = currentMode === 'login' ? '/api/login' : '/api/register';
 
         try {
             const bodyData = { username, password };
             if (currentMode === 'register') {
                 bodyData.email = email;
+            } else {
+                bodyData.rememberMe = rememberMe;
             }
 
             const response = await fetch(endpoint, {
@@ -203,5 +219,76 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error cargando stats de admin:', error);
             adminStatsList.innerHTML = '<div class="error-msg">Error de conexión</div>';
         }
+    }
+
+    // --- LÓGICA DE MEDIDOR DE FORTALEZA DE CONTRASEÑA ---
+    const passwordInput = document.getElementById('password');
+
+    passwordInput.addEventListener('input', () => {
+        if (currentMode !== 'register') {
+            strengthMeter.classList.add('hidden');
+            return;
+        }
+
+        const val = passwordInput.value;
+        if (!val) {
+            strengthMeter.classList.add('hidden');
+            return;
+        }
+
+        strengthMeter.classList.remove('hidden');
+        updatePasswordStrength(val);
+    });
+
+    function updatePasswordStrength(password) {
+        const result = analyzePasswordStrength(password);
+        
+        strengthBar.className = 'strength-bar ' + result.scoreClass;
+        strengthBar.style.width = result.percent + '%';
+        
+        strengthText.textContent = 'Fortaleza: ' + result.label;
+        strengthText.className = 'strength-text ' + result.scoreClass + '-text';
+    }
+
+    function analyzePasswordStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 6) score += 1;
+        if (password.length >= 10) score += 1;
+        if (/[A-Z]/.test(password)) score += 1;
+        if (/[0-9]/.test(password)) score += 1;
+        if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+        let percent = 0;
+        let label = 'Muy débil';
+        let scoreClass = 'weak';
+
+        if (password.length < 4) {
+            percent = 10;
+            label = 'Muy débil';
+            scoreClass = 'weak';
+        } else if (score <= 1) {
+            percent = 25;
+            label = 'Débil';
+            scoreClass = 'weak';
+        } else if (score === 2) {
+            percent = 50;
+            label = 'Aceptable';
+            scoreClass = 'fair';
+        } else if (score === 3) {
+            percent = 70;
+            label = 'Buena';
+            scoreClass = 'good';
+        } else if (score === 4) {
+            percent = 85;
+            label = 'Fuerte';
+            scoreClass = 'strong';
+        } else if (score >= 5) {
+            percent = 100;
+            label = 'Excelente';
+            scoreClass = 'excellent';
+        }
+
+        return { percent, label, scoreClass };
     }
 });
