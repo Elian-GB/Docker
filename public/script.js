@@ -20,12 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const userNameDisplay = document.getElementById('user-name-display');
     const personalVisitsCount = document.getElementById('personal-visits-count');
     const adminStatsList = document.getElementById('admin-stats-list');
+    const togglePasswordBtn = document.getElementById('toggle-password-btn');
+    const eyeIcon = document.getElementById('eye-icon');
 
     // Toast Container
     const toastContainer = document.getElementById('toast-container');
 
     // Estado local
     let currentMode = 'login'; // 'login' o 'register'
+    let adminChartInstance = null; // Instancia global del gráfico
 
     // Función para mostrar Toast Notifications
     function showToast(message, type = 'info') {
@@ -191,13 +194,88 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const stats = await response.json();
-            adminStatsList.innerHTML = ''; // Limpiar
+            adminStatsList.innerHTML = ''; // Limpiar lista
 
             if (stats.length === 0) {
                 adminStatsList.innerHTML = '<div class="loading">No hay datos aún.</div>';
                 return;
             }
 
+            // Ordenar cronológicamente (ascendente) para el gráfico
+            const chronoStats = [...stats].reverse();
+
+            // --- RENDERIZAR GRÁFICO CHART.JS ---
+            const canvas = document.getElementById('adminChart');
+            const ctx = canvas.getContext('2d');
+
+            // Crear degradado morado/azul para el área bajo la curva
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.5)');
+            gradient.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+
+            // Si ya hay un gráfico previo, destruirlo antes de crear uno nuevo
+            if (adminChartInstance) {
+                adminChartInstance.destroy();
+            }
+
+            adminChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chronoStats.map(s => s.date),
+                    datasets: [{
+                        label: 'Visitas',
+                        data: chronoStats.map(s => s.count),
+                        fill: true,
+                        backgroundColor: gradient,
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#8b5cf6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#a78bfa',
+                        tension: 0.4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f8fafc',
+                            bodyFont: { family: 'Inter', size: 14, weight: '600' },
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: (ctx) => ` ${ctx.parsed.y} visitas`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 }, stepSize: 1 }
+                        }
+                    }
+                }
+            });
+
+            // --- RENDERIZAR LISTA DETALLADA ABAJO DEL GRÁFICO ---
             stats.forEach(stat => {
                 const item = document.createElement('div');
                 item.className = 'admin-stat-item fade-in';
@@ -219,6 +297,39 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error cargando stats de admin:', error);
             adminStatsList.innerHTML = '<div class="error-msg">Error de conexión</div>';
         }
+    }
+
+    // --- LÓGICA DEL BOTÓN OJO DE CONTRASEÑA ---
+    const eyeOpenPaths = [
+        { tag: 'path', d: 'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z' },
+        { tag: 'circle', cx: '12', cy: '12', r: '3' }
+    ];
+    const eyeClosedPaths = [
+        { tag: 'path', d: 'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19' },
+        { tag: 'path', d: 'M1 1l22 22' }
+    ];
+    let passwordVisible = false;
+
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', () => {
+            const passwordInput = document.getElementById('password');
+            passwordVisible = !passwordVisible;
+            passwordInput.type = passwordVisible ? 'text' : 'password';
+
+            // Limpiar el SVG y redibujar los paths correctos
+            eyeIcon.innerHTML = '';
+            const paths = passwordVisible ? eyeClosedPaths : eyeOpenPaths;
+            paths.forEach(p => {
+                const el = document.createElementNS('http://www.w3.org/2000/svg', p.tag);
+                if (p.d) el.setAttribute('d', p.d);
+                if (p.cx) el.setAttribute('cx', p.cx);
+                if (p.cy) el.setAttribute('cy', p.cy);
+                if (p.r) el.setAttribute('r', p.r);
+                eyeIcon.appendChild(el);
+            });
+
+            togglePasswordBtn.setAttribute('aria-label', passwordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
     }
 
     // --- LÓGICA DE MEDIDOR DE FORTALEZA DE CONTRASEÑA ---
